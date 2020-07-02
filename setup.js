@@ -1,6 +1,6 @@
 const phidget22 = require('phidget22');
 
-class Setup {
+class PhidgetController {
     constructor() {
         this.SERVER_PORT = 5661;
 
@@ -11,7 +11,7 @@ class Setup {
         this.motorsAttached = false;
     }
 
-    async main() {
+    async init() {
 
         if (process.argv.length != 3) {
             console.log('usage: node runFile.js <server address>');
@@ -25,6 +25,7 @@ class Setup {
             await conn.connect();
             await this.setupMotorFunctions();
             await this.initMotors();
+            await this.timeout(1000);
         } catch(err) {
             console.error('Error running example:', err.message);
             process.exit(1);
@@ -35,21 +36,11 @@ class Setup {
     //<DCMotor functions>
 
     async updateMotorVelocity(targetVelocity, motor, time) {
-        try {
-            await this.sleep(this.setMotorTargetVelocity, time, targetVelocity, motor);
-        } catch(err) {
-            console.error(err);
-        }
-        
-        
+        await this.sleep(this.setMotorTargetVelocity, time, targetVelocity, motor); 
     }
 
     setMotorTargetVelocity(targetVelocity, motor) {
-        try {
-            motor.setTargetVelocity(targetVelocity);
-        } catch(err) {
-            console.error(err);
-        }
+        motor.setTargetVelocity(targetVelocity);
     }
 
     
@@ -148,13 +139,9 @@ class Setup {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     async sleep(fn, time, ...args) {
-        try {
-            await this.timeout(time);
-            return fn(...args);
-        } catch(err) {
-            console.error(err);
-        }
+        await this.timeout(time);
+        return fn(...args);
     }
 }
 
-module.exports = Setup;
+module.exports = PhidgetController;

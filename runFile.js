@@ -1,12 +1,19 @@
-const Setup = require('./setup.js');
-let setup = new Setup();
+async function main() {
+    const PhidgetController = require('./setup.js');
+    let phidgetController = new PhidgetController();
 
-setup.main()
+    await phidgetController.init();
+
+    const Printer = require('./printer');
+    const printer = new Printer(phidgetController);
+
+    const Plotter = require('./plotter');
+    const plotter = new Plotter(phidgetController);
+
+    plotter.start();
+}
+
+main()
 .catch((err) => {
     throw err;
 });
-
-const Printer = require('./printer');
-const printer = new Printer(setup);
-
-printer.start();
