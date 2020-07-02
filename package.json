@@ -1,0 +1,14 @@
+{
+  "name": "printer",
+  "version": "1.0.0",
+  "description": "a printer made with lego",
+  "main": "printer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sam",
+  "license": "ISC",
+  "dependencies": {
+    "phidget22": "^2.6.6"
+  }
+}
