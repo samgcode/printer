@@ -1,5 +1,4 @@
-let phidget22 = require('phidget22');
-let printer = require('./printer');
+const phidget22 = require('phidget22');
 
 class Setup {
     constructor() {
@@ -8,13 +7,14 @@ class Setup {
         this.xAxis = new phidget22.DCMotor();
         this.yAxis = new phidget22.DCMotor();
 
-        this.main();
+        this.attachedMotors = 0;
+        this.motorsAttached = false;
     }
 
     async main() {
 
         if (process.argv.length != 3) {
-            console.log('usage: node setup.js <server address>');
+            console.log('usage: node runFile.js <server address>');
             process.exit(1);
         }
         var hostname = process.argv[2];
@@ -25,7 +25,6 @@ class Setup {
             await conn.connect();
             await this.setupMotorFunctions();
             await this.initMotors();
-            //printer.start();
         } catch(err) {
             console.error('Error running example:', err.message);
             process.exit(1);
@@ -35,9 +34,25 @@ class Setup {
 
     //<DCMotor functions>
 
-    updateMotorVelocity(targetVelocity, motor) {
-        motor.setTargetVelocity(targetVelocity);
+    async updateMotorVelocity(targetVelocity, motor, time) {
+        try {
+            await this.sleep(this.setMotorTargetVelocity, time, targetVelocity, motor);
+        } catch(err) {
+            console.error(err);
+        }
+        
+        
     }
+
+    setMotorTargetVelocity(targetVelocity, motor) {
+        try {
+            motor.setTargetVelocity(targetVelocity);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+
+    
 
     motorAttachHandler(ch) {
         console.log(ch + ' attached');
@@ -126,6 +141,19 @@ class Setup {
 
         this.xAxis.setAcceleration(100);
         this.yAxis.setAcceleration(100);
+    }
+
+    //promise based setTimeout replacment
+    async timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async sleep(fn, time, ...args) {
+        try {
+            await this.timeout(time);
+            return fn(...args);
+        } catch(err) {
+            console.error(err);
+        }
     }
 }
 
